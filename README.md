@@ -5,8 +5,11 @@ The repository contains all  relevant files associated with the Individual Based
 Tsetse flies are vectors for both human and animal sleeping sickness. Over the past decades,  temperature has continued to increase in the Zambezi valley of Zimbabwe. My project aims to estimate extinction probability for tsetse populations in the Zambezi valley of Zimbabwe, as temperature and other meteorological factors fluctuate both diurnally and seasonally. 
 ## Possible impact of study. 
 
+
 # Aim
 The aim of this project is to apply all the good coding practices that I have learned during the first week of SEAMS to my IBM project, and to create an interface between R and NetLogo to allow more flexibility in the statistcal analysis of the model output. 
+
+![Work flow](workflow.png)
 
 # Objectives
 - Add comments to the NetLogo code to improve its readability  
