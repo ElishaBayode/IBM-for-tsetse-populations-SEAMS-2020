@@ -10,5 +10,4 @@ The aim of this project is to apply all the good coding practices that I have le
 - Install RNetLogo package in R to create an interface between R and NetLogo 
 - Run several simulations in R and store outputs for statistical analysis 
 
-# 
 
