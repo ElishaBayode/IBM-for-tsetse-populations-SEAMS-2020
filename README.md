@@ -19,4 +19,15 @@ The aim of this project is to apply all the good coding practices that I have le
 - Install RNetLogo package in R to create an interface between R and NetLogo 
 - Run several simulations in R and store outputs for statistical analysis 
 
+# Modification
+
+I am making the following changes to my to-do list (after  meeting with some faculty members).
+
+- Clean-up the .csv output from NetLogo by removing unnecessary lines containing NetLogo experiment default settings (they can be accessed in NetLogo) 
+
+- Import the data to R 
+- Write R script to reshape the data 
+- Change the data format from wide-format to long-format
+- Analyze the data to produce a more usable version for further statistical analysis.
+
 
