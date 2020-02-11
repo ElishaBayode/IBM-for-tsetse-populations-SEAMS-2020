@@ -69,7 +69,7 @@ to setup                                                       ;Initialize the m
   setup-immature-adults
   setup-larvipositing-adults
   file-close-all                                            ; Close any files open from last run
-  file-open "1987temp.csv"                                 ;Other temperature data in the source folder : 1yeartemp.csv controlledTemp.csv;constant_temp.csv, 1960 (5 times)  .csv
+  file-open "controlledTemp.csv"   ;                  controlledTemp.csv          ;Other temperature data in the source folder : 1yeartemp.csv controlledTemp.csv;constant_temp.csv, 1960 (5 times)  .csv, 1987temp.csv
   ; other setup goes here
   reset-ticks
 end
@@ -119,7 +119,7 @@ to setup-larvipositing-adults
 end
 
 to go ; to start simulation
-  set-current-directory "C:/Users/ELISHAARE/Desktop/New IBM for tsetse-SEAMS2020"  ; Setting the current directory
+  set-current-directory "C:/Users/ELISHAARE/Desktop/New IBM for tsetse-SEAMS2020/IBM-for-tsetse-populations-SEAMS-2020"  ; Setting the current directory
   if file-at-end? [ stop ]
   set temp csv:from-row file-read-line
   ; model update goes here
@@ -178,9 +178,9 @@ to move-larvipositing-adults  ; allow flies to move randomly
 end
 
 
-                     ;17.94
+                     ; ; 15.9 I used this value to slow down pupal dev
 to develop-pupa   ;pupae developing based on daily development fraction (this will be made temperature dependent)
-  let pupal-growth ( 1 / (15.94 + 82.3 * exp(-0.253 * (  one-of temp - 16))))   ; development rate is temperature dependent. This formula is from Are & Hargrove (2019)
+  let pupal-growth ( 1 / (17.94 + 82.3 * exp(-0.253 * (  one-of temp - 16))))   ; development rate is temperature dependent. This formula is from Are & Hargrove (2019)
   set dev_frac  dev_frac + pupal-growth
   set age age + 1
   let temp_now  one-of temp
@@ -191,7 +191,7 @@ end
 
 to emerge-pupa   ; pupae emerging as immature adults
 if dev_frac >= 1[          ;0.002
-    ifelse random-float 1 < (0.790001 + 0.00534 * exp(-1.552 * ((total_temp / age) - 16))  + 0.03 * exp(1.27100 * ((total_temp / age) - 32)) )
+    ifelse random-float 1 < (0.002 + 0.00534 * exp(-1.552 * ((total_temp / age) - 16))  + 0.03 * exp(1.27100 * ((total_temp / age) - 32)) )
     [set breed leafs]   ;(b_1 + b_2 * exp(-b_3*((total_temp / age) - 16))  + b_4 * exp(-b_5*((total_temp / age) - 32))                    ; (Temperature-dependent mortality) The average tepmerature over the pupal period will determine the mortality
   [set breed immature-adults
   set shape "immature-adult"
@@ -243,13 +243,13 @@ end
 
 
 to kill-pupae               ;background mortality for pupae
-if random-float 1 < 0;.0001;0.001 ;* exp (0.001 * age)  ;probably too high
+if random-float 1 < 0.02;0.001 ;* exp (0.001 * age)  ;probably too high
   [set breed leafs
   set age1 1]
 end
 
 to kill-immature-adults    ;immature-adults  background mortality for
- if random-float 1 < 0.00001; 0.1 * exp (- 0.6 * age); 0.02
+ if random-float 1 < 0.02; 0.1 * exp (- 0.6 * age); 0.02
   [set breed flowers
   set age1 1]
 
@@ -262,7 +262,7 @@ to Tempdepkill-immature-adults    ;immature-adults  background mortality for
 end
                            ;- 1.543
 to Tempdepkill-larvipositing-adults    ;larvipositing-adults  background mortality for
- if random-float 1 <=  exp(- 2.99943 + 0.083 * one-of temp) / 100;exp(- 0.85 + 0.083 * one-of temp) / 100
+ if random-float 1 <=  exp( - 1.543 + 0.083 * one-of temp) / 100;exp(- 0.85 + 0.083 * one-of temp) / 100
   [set breed houses
   set age1 1]
 end
@@ -292,7 +292,7 @@ to densityDepkill-pupae    ; Density-dependent mortality. This ensures the popul
 ;KK <- 30000
 
 ;mu <- a0 / (1 + KK*exp(-5e-4*NN))
- if random-float 1 <= (0.02359 / (1 + 15 * exp(-7e-4 * 15000)));(0.05 / (1 + 150000 * exp(-4e-4 * count pupae)))
+ if random-float 1 <= (0.8 / (1 + 15000 * exp(-4e-4 * count pupae)));(0.02359 / (1 + 15 * exp(-7e-4 * 15000)))
   [die]
 end
 
@@ -402,7 +402,7 @@ initial_no_pupae
 initial_no_pupae
 0
 25000
-10510.0
+802.0
 1
 1
 NIL
@@ -417,7 +417,7 @@ initial_no_immature_adults
 initial_no_immature_adults
 0
 6000
-3064.0
+7006.0
 1
 1
 NIL
@@ -432,7 +432,7 @@ initial_no_larvipositing_adults
 initial_no_larvipositing_adults
 0
 16000
-10210.0
+3039.0
 1
 1
 NIL
@@ -559,7 +559,6 @@ false
 PENS
 "MortalityRatePupae" 1.0 0 -16777216 true "" "plot 100 * (count leafs / count pupae) "
 "MortalityRateMature" 1.0 0 -2674135 true "" "plot 100 * (count houses / count larvipositing-adults )"
-"temp " 1.0 0 -987046 true "" "plot one-of temp "
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -935,6 +934,102 @@ NetLogo 6.0.3
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="MultiSimu10" repetitions="10" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count  immature-adults</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 1]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 2]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 3]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 4]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 5]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 6]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 7]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 8]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 9]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 10]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 11]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 12]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 13]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 14]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 15]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 16]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 17]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 18]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 19]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 20]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 21]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 22]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 23]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 24]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 25]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 26]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 27]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 28]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 29]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 30]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 31]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 32]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 33]</metric>
+    <enumeratedValueSet variable="initial_no_immature_adults">
+      <value value="7006"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial_no_larvipositing_adults">
+      <value value="3039"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial_no_pupae">
+      <value value="802"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="MultiSimu10" repetitions="10" runMetricsEveryStep="true">
+    <setup>setup</setup>
+    <go>go</go>
+    <metric>count  immature-adults</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 1]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 2]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 3]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 4]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 5]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 6]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 7]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 8]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 9]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 10]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 11]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 12]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 13]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 14]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 15]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 16]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 17]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 18]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 19]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 20]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 21]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 22]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 23]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 24]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 25]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 26]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 27]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 28]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 29]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 30]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 31]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 32]</metric>
+    <metric>count  larvipositing-adults with [ovarian_age = 33]</metric>
+    <enumeratedValueSet variable="initial_no_immature_adults">
+      <value value="191"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial_no_larvipositing_adults">
+      <value value="152"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial_no_pupae">
+      <value value="478"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
